@@ -16,7 +16,8 @@ from pprint import pprint
 class Course:
   dates = []
   
-  def __init__(self, name, lecturer):
+  def __init__(self, id, name, lecturer):
+    self.id = id
     self.name = name
     self.lecturer = lecturer
 
@@ -34,7 +35,7 @@ class Date:
     count = len(timetable_blocks)
     for i in range(0, count):
       # if event starts later than the last block starts, assign it to the last block
-      if self.start.time() >= timetable_blocks[i]['time'] and (i == count - 1 or self.start.time() <= timetable_blocks[i+1]['time']):
+      if self.start.time() >= timetable_blocks[i]['time'] and (i == count - 1 or self.start.time() < timetable_blocks[i+1]['time']):
         return timetable_blocks[i]['block']
 
 # download data of all courses into subdirectory
@@ -49,16 +50,15 @@ def get_course(course_number):
     
     # use rest api to access data
     response = urllib.request.urlopen("http://www.kithub.de/api/terms/{0}/events.json?type=detail&no={1}".format(term_id, course_number)).readall().decode('utf8')
-    # TODO: catch exceptions
+    # TODO: catch exceptions for next line
     data = json.loads(response)
+    # TODO: include LV-Nr. for each object in data
     
     if not os.path.exists(json_directory):
       os.makedirs(json_directory)
     with open("{0}/{1}.json".format(json_directory, course_number), 'w') as file:
       # TODO: unicode? ü gets written as \u00fc
       file.write(json.dumps(data, indent=2, sort_keys=True))
-      #pprint(response, stream=file)
-      #file.write(response)
     
   except urllib.error.URLError as err:
     print("URLError while fetching course '{0}': {1}".format(course_number, err.reason))
@@ -72,14 +72,21 @@ def get_course(course_number):
 
 def build_timetable():
   # iterate over all courses
-  for course in courses:
+  for course in courses.values():
+    found_date = False
     # iterate over all events
     for date in course.dates:
       if date.is_within_eva_period():
+        found_date = True
         # include in the timetable
         weekday = date.start.isoweekday()
         block   = date.get_timetable_block()
-        timetable[weekday][block].append(course.name)
+        if not course.id in timetable[weekday][block]:
+          timetable[weekday][block][course.id] = []
+        timetable[weekday][block][course.id].append(date)
+        # TODO: somehow save information on dates on other weekdays so this can be displayed in the timetable, like 'also on Friday'
+    if not found_date:
+      print("ERROR: Did not find any date within the evaluation period for the course '{0}', LV-Nr. {1}!".format(course.name, course.id))
 
 def load_courses_from_filesystem():
   for file in glob.glob("{0}/*.json".format(json_directory)):
@@ -88,9 +95,9 @@ def load_courses_from_filesystem():
     if len(data) > 1:
       print("There is more than 1 object encoded in file {0}. Please have a look. For now, I import them all.".format(file))
     for o in data:
-      course = Course(o['name'], o['lecturer'])
+      course = Course(o['id'], o['name'], o['lecturer'])
       course.dates = course_parse_dates(o['dates'])
-      courses.append(course)
+      courses[course.id] = course
 
 # replace datetime in string format by an actual datetime object
 def course_parse_dates(dates):
@@ -110,9 +117,6 @@ def parse_datetime(str):
 def verbose(str):
   print(str)
 
-
-# TODO: recognize if a course has no event within the evaluation period
-
 term_id = 7022 # Sommersemester 2014
 #term_id = 4521 # Wintersemester 2013/14
 json_directory = "courses"
@@ -122,7 +126,7 @@ json_directory = "courses"
 datetime_format = "%Y-%m-%dT%H%M%S%z" # 2014-06-11T19:00:00+02:00
 
 eva_starttime = parse_datetime("2014-06-09T00:00:00+02:00")
-eva_endtime   = parse_datetime("2014-06-27T23:59:59+02:00")
+eva_endtime   = parse_datetime("2014-06-20T23:59:59+02:00")
 
 timetable_blocks = [{'time': time(hour= 8, minute= 0), 'block': 1},
                     {'time': time(hour= 9, minute=45), 'block': 2},
@@ -131,8 +135,8 @@ timetable_blocks = [{'time': time(hour= 8, minute= 0), 'block': 1},
                     {'time': time(hour=15, minute=45), 'block': 5},
                     {'time': time(hour=17, minute=30), 'block': 6}]
 
-# holds all courses
-courses = []
+# holds all courses as Course objects with course.id as key
+courses = {}
 
 # holds all days, and within them all blocks and within these the courses
 timetable = {}
@@ -140,10 +144,10 @@ timetable = {}
 for day in range(1, 6):
   blocks = {}
   for block in range(1, 9):
-    blocks[block] = []
+    blocks[block] = {}
   timetable[day] = blocks
 
-#get_courses([4010021, 4010041, 4012142])
+#get_courses([4010021, 4010041])
 load_courses_from_filesystem()
 build_timetable()
 
