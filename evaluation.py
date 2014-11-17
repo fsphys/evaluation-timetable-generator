@@ -229,7 +229,7 @@ for weekday in range(1, 6):
             course = courses[course_id]
             print("    {0}, {1}".format(course.name, course.lecturer))
             for appointment in timetable[weekday][block][course_id]:
-                print("      {0}".format(appointment.start.strftime("%d.%m.")))
+                print("      {0}, {1}".format(appointment.start.strftime("%d.%m."), appointment.room))
             for weekday_other, block_other in course.occurrences:
                 if not (weekday_other == weekday and block_other == block):
                     print(
