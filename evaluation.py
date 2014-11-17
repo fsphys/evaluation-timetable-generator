@@ -142,12 +142,12 @@ def build_timetable():
                 block = date.get_timetable_block()
 
                 # append the date to the list of dates in the timetable
-                if not course_id in timetable[weekday][block]:
+                if course_id not in timetable[weekday][block]:
                     timetable[weekday][block][course_id] = []
                 timetable[weekday][block][course_id].append(date)
 
                 # append this [weekday, block] to the list of occurrences
-                if not [weekday, block] in course.occurrences:
+                if [weekday, block] not in course.occurrences:
                     course.occurrences.append([weekday, block])
 
         if not found_date:
