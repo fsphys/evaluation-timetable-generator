@@ -111,7 +111,6 @@ def get_course(course_number):
         if not os.path.exists(json_directory):
             os.makedirs(json_directory)
         with open("{0}/{1}.json".format(json_directory, course_number), 'w') as file:
-            # TODO: unicode? ü gets written as \u00fc
             file.write(json.dumps(data, indent=2, sort_keys=True))
 
     except urllib.error.URLError as err:
@@ -151,8 +150,6 @@ def build_timetable():
                 if not [weekday, block] in course.occurrences:
                     course.occurrences.append([weekday, block])
 
-        #sorted(timetable[weekday][block][course_id], key=lambda appointment: appointment.start)
-
         if not found_date:
             print(
                 "ERROR: Did not find any date within the evaluation period for the course '{0}', LV-Nr. {1}!".format(course.name, course.lvnr))
@@ -170,9 +167,6 @@ def load_courses_from_filesystem():
                 object['id'], object['no'], object['name'], object['lecturer'])
             course.dates = course_parse_dates(object['dates'])
             courses[course.id] = course
-            #print("{0}. {1}, {2}, {3}, {4}".format(i, course.id, course.lvnr, course.name, course.lecturer))
-            # for i, date in enumerate(course.dates):
-            #print("  {0}. {1}–{2} in {3}".format(i, date.start, date.end, date.room))
 
 
 # replace datetime in string format by an actual datetime object
