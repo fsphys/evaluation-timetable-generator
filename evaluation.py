@@ -64,8 +64,7 @@ class Course:
         self.name = name
         self.lecturer = lecturer
         # all occurrences over the whole semester
-        # TODO: choose a better name
-        self.dates = []
+        self.appointments = []
         # just occurrences within the time frame, containing a list of
         # [weekday, block] pairs
         # TODO: choose a better name
@@ -131,29 +130,29 @@ def get_course(course_number):
 def build_timetable():
     # iterate over all courses
     for course_id, course in courses.items():
-        found_date = False
+        found_appointment = False
         # iterate over all events
-        for date in course.dates:
-            if date.is_within_eva_period():
-                found_date = True
+        for appointment in course.appointments:
+            if appointment.is_within_eva_period():
+                found_appointment = True
 
                 # get information about position in timetable
-                weekday = date.start.isoweekday()
-                block = date.get_timetable_block()
+                weekday = appointment.start.isoweekday()
+                block = appointment.get_timetable_block()
 
                 # append the date to the list of dates in the timetable
                 if course_id not in timetable[weekday][block]:
                     timetable[weekday][block][course_id] = []
-                timetable[weekday][block][course_id].append(date)
+                timetable[weekday][block][course_id].append(appointment)
 
                 # append this [weekday, block] to the list of occurrences
                 if [weekday, block] not in course.occurrences:
                     course.occurrences.append([weekday, block])
 
-        if not found_date:
+        if not found_appointment:
             courses_missed[course.id] = course
             print(
-                "ERROR: Did not find any date within the evaluation period for the course '{0}', LV-Nr. {1}!".format(course.name, course.lvnr))
+                "ERROR: Did not find any appointment within the evaluation period for the course '{0}', LV-Nr. {1}!".format(course.name, course.lvnr))
 
 
 def load_courses_from_filesystem():
@@ -166,20 +165,20 @@ def load_courses_from_filesystem():
         for i, object in enumerate(data):
             course = Course(
                 object['id'], object['no'], object['name'], object['lecturer'])
-            course.dates = course_parse_dates(object['dates'])
+            course.appointments = course_parse_appointments(object['dates'])
             courses[course.id] = course
 
 
 # replace datetime in string format by an actual datetime object
-def course_parse_dates(dates):
-    dates_list = []
+def course_parse_appointments(dates):
+    appointments = []
     for date in dates:
-        date_object = Appointment(parse_datetime(
+        appointment = Appointment(parse_datetime(
             date["start_time"]), parse_datetime(date["end_time"]), date["room"])
-        dates_list.append(date_object)
+        appointments.append(appointment)
     # sort the list by start date
-    dates_list.sort(key=lambda appointment: appointment.start)
-    return dates_list
+    appointments.sort(key=lambda appointment: appointment.start)
+    return appointments
 
 
 # parse the datetime format of the kithub api and return a datetime object
@@ -229,15 +228,15 @@ for weekday in range(1, 6):
         for course_id in timetable[weekday][block].keys():
             course = courses[course_id]
             print("    {0}, {1}".format(course.name, course.lecturer))
-            for date in timetable[weekday][block][course_id]:
-                print("      {0}".format(date.start.strftime("%d.%m.")))
-            for otherweekday, otherblock in course.occurrences:
-                if not (otherweekday == weekday and otherblock == block):
+            for appointment in timetable[weekday][block][course_id]:
+                print("      {0}".format(appointment.start.strftime("%d.%m.")))
+            for weekday_other, block_other in course.occurrences:
+                if not (weekday_other == weekday and block_other == block):
                     print(
-                        "      Auch {0}/{1}".format(weekdays_short[otherweekday], otherblock))
-                    for appointment in timetable[otherweekday][otherblock][course_id]:
+                        "      Auch {0}/{1}".format(weekdays_short[weekday_other], block_other))
+                    for appointment_other in timetable[weekday_other][block_other][course_id]:
                         print(
-                            "        {0}".format(appointment.start.strftime("%d.%m.")))
+                            "        {0}".format(appointment_other.start.strftime("%d.%m.")))
 
 print("Für die folgenden Veranstaltungen wurde kein Termin im gewählten Zeitfenster gefunden:")
 if not courses_missed:
