@@ -151,6 +151,7 @@ def build_timetable():
                     course.occurrences.append([weekday, block])
 
         if not found_date:
+            courses_missed[course.id] = course
             print(
                 "ERROR: Did not find any date within the evaluation period for the course '{0}', LV-Nr. {1}!".format(course.name, course.lvnr))
 
@@ -199,6 +200,8 @@ print("Printing time interval {0} to {1}".format(eva_starttime, eva_endtime))
 
 # holds all courses as Course objects with course.id as key
 courses = {}
+# holds courses for which no appointment was found within the time interval
+courses_missed = {}
 
 # holds all days, and within them all blocks and within these the courses
 timetable = {}
@@ -235,3 +238,10 @@ for weekday in range(1, 6):
                     for appointment in timetable[otherweekday][otherblock][course_id]:
                         print(
                             "        {0}".format(appointment.start.strftime("%d.%m.")))
+
+print("Für die folgenden Veranstaltungen wurde kein Termin im gewählten Zeitfenster gefunden:")
+if not courses_missed:
+    print("  keine")
+else:
+    for course in courses_missed.values():
+        print("{0}, {1}, {2}".format(course.lvnr, course.name, course.lecturer))
