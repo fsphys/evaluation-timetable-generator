@@ -57,6 +57,7 @@ Execute `./evaluation.py` in the directory where the script is located.
 
 ### Output
 
+The downloaded lecture data will be written to JSON files in a subdirectory `courses`.
 By default, the script writes the timetable to `timetable.ods` and a file `output.ods` in the current working directory.
 The file `output.ods` is a copy of `input.csv` with two additional columns.
 These can be used to check certain functions of the script:

@@ -247,6 +247,13 @@ def print_row(spreadsheet, row_number, row):
         print_cell(spreadsheet, row_number, i+1, cell)
 
 
+if os.path.isdir(json_directory):
+    if input("Directory '{0}' does not exist, create? (y/N) ".format(json_directory)) == "y":
+        os.makedirs(json_directory)
+    else:
+        print("Abort.")
+        exit(1)
+
 # holds all courses as Course objects with course.lvnr as key
 courses = {}
 # holds courses for which no appointment was found within the time interval
@@ -387,7 +394,7 @@ else:
 
 
 if os.path.exists(output_file):
-    if input("{0} already exists, overwrite? (y/N) ".format(output_file)) == "y":
+    if input("File '{0}' already exists, overwrite? (y/N) ".format(output_file)) == "y":
         os.remove(output_file)
     else:
         print("Abort.")
@@ -431,7 +438,7 @@ with open(input_file, newline='') as csvfile_input:
 
 
 if os.path.exists(output_comparison_file):
-    if input("{0} already exists, overwrite? (y/N) ".format(output_comparison_file)) == "y":
+    if input("File '{0}' already exists, overwrite? (y/N) ".format(output_comparison_file)) == "y":
         os.remove(output_comparison_file)
     else:
         print("Abort.")
