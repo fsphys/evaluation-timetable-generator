@@ -12,7 +12,6 @@ import json
 import urllib.request
 import csv
 from datetime import datetime, time
-from pprint import pprint
 
 from simpleodspy.sodsspreadsheet import SodsSpreadSheet
 from simpleodspy.sodsods import SodsOds
@@ -248,10 +247,6 @@ def print_row(spreadsheet, row_number, row):
         print_cell(spreadsheet, row_number, i+1, cell)
 
 
-# TODO: only overwrite if option --overwrite is passed or ask
-if os.path.exists(output_file):
-    os.remove(output_file)
-
 # holds all courses as Course objects with course.lvnr as key
 courses = {}
 # holds courses for which no appointment was found within the time interval
@@ -391,12 +386,18 @@ else:
         print("{0}, {1}, {2}".format(course.lvnr, course.name, course.lecturer))
 
 
+if os.path.exists(output_file):
+    if input("{0} already exists, overwrite? (y/N) ".format(output_file)) == "y":
+        os.remove(output_file)
+    else:
+        print("Abort.")
+        exit(1)
+
 # produce ODS file for timetable
 Sods_ods = SodsOds(spreadsheet_timetable)
 Sods_ods.save(output_file)
 
 # produce ODS file for comparison of input and output
-# TODO: if file exists, only overwrite if option --overwrite is passed (or ask)
 with open(input_file, newline='') as csvfile_input:
     spamreader = csv.reader(csvfile_input, delimiter=',', quotechar='"')
 
@@ -428,9 +429,13 @@ with open(input_file, newline='') as csvfile_input:
             elif found_appointment == "…":
                 spreadsheet_output_comparison.setStyle(cell_coordinate(i+1, output_comparison_col_found_appointment), background_color= "#ffffe0")
 
-# TODO: only overwrite if option --overwrite is passed or ask
+
 if os.path.exists(output_comparison_file):
-    os.remove(output_comparison_file)
+    if input("{0} already exists, overwrite? (y/N) ".format(output_comparison_file)) == "y":
+        os.remove(output_comparison_file)
+    else:
+        print("Abort.")
+        exit(1)
 
 Sods_ods = SodsOds(spreadsheet_output_comparison)
 Sods_ods.save(output_comparison_file)
