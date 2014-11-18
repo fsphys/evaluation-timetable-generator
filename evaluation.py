@@ -247,13 +247,6 @@ def print_row(spreadsheet, row_number, row):
         print_cell(spreadsheet, row_number, i+1, cell)
 
 
-if os.path.isdir(json_directory):
-    if input("Directory '{0}' does not exist, create? (y/N) ".format(json_directory)) == "y":
-        os.makedirs(json_directory)
-    else:
-        print("Abort.")
-        exit(1)
-
 # holds all courses as Course objects with course.lvnr as key
 courses = {}
 # holds courses for which no appointment was found within the time interval
