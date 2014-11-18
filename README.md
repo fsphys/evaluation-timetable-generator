@@ -10,7 +10,7 @@ As output, an OpenDocument Spreadsheet file is generated.
 ## Prerequisites
 
 * Python 3
-* [simpleodspy](https://pypi.python.org/pypi/simpleodspy). As the current version has a bug that makes it impossible to insert text in cells, use the [fork of blipp](), where this is fixed:
+* [simpleodspy](https://pypi.python.org/pypi/simpleodspy). As the current version has a bug that makes it impossible to insert text in cells, use the [fork of blipp](https://github.com/blipp/simpleodspy), where this is fixed:
     * `pip install git+https://github.com/blipp/simpleodspy.git@fix-decoding-str`
 * [odfpy](https://pypi.python.org/pypi/odfpy), the most recent version supports Python 3 and is available on GitHub: https://github.com/eea/odfpy . Follow the instructions in the readme there to install it.
 
