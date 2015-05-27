@@ -34,7 +34,8 @@ weekdays = {1: "Montag", 2: "Dienstag",
 weekdays_short = {1: "Mo", 2: "Di", 3: "Mi", 4: "Do", 5: "Fr"}
 
 # get this from http://www.kithub.de/api/#!/terms/GET-terms---format-_get_0
-term_id = 7895  # Wintersemester 2014/15
+term_id = 10222 # Sommersemester 2015
+#term_id = 7895  # Wintersemester 2014/15
 # term_id = 7022 # Sommersemester 2014
 # term_id = 4521 # Wintersemester 2013/14
 
@@ -47,8 +48,8 @@ datetime_format = "%Y-%m-%dT%H%M%S%z"  # 2014-06-11T19:00:00+02:00
 
 # start and end time of the interval, in KitHub's datetime format,
 # for example "2014-06-09T00:00:00+02:00"
-eva_starttime_str = "2014-12-01T00:00:00+02:00"
-eva_endtime_str = "2014-12-12T23:59:59+02:00"
+eva_starttime_str = "2015-06-01T00:00:00+02:00"
+eva_endtime_str = "2015-06-19T23:59:59+02:00"
 
 # start time of blocks in the timetable
 timetable_blocks = [{'time': time(hour=8, minute=0), 'block': 1},
