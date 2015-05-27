@@ -50,6 +50,9 @@ rooms_file = "rooms.csv"
 output_file = "timetable.ods"
 output_comparison_file = "output.ods"
 
+# append the course of studies to the name of each lecture
+show_course_of_studies = False
+
 # translation of weekdays
 # TODO: change to strftime
 weekdays = {1: "Montag", 2: "Dienstag",
@@ -318,7 +321,7 @@ with open(input_file, newline='') as csvfile:
                 course.name_short += " +Übung"
             if row[output_comparison_col_praktikum - 1] == "x":
                 course.name_short += " +Prakt"
-            if row[1] != "":
+            if show_course_of_studies and row[1] != "":
                 course.name_short += " ({0})".format(row[1])
             courses[course.lvnr] = course
         row_counter += 1
