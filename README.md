@@ -37,9 +37,12 @@ The time interval for which the timetable will be generated has to be specified 
 ### Input data
 
 By default, the script expects a file `input.csv` in its working directory.
-This file has to follow a certain format:
-* The column delimiter needs to be `,` and `"` needs to be used for quoting strings.
-* The first row is the header and will be ignored.
+The column delimiter needs to be `,` and `"` needs to be used for quoting strings.
+The first row is the header and will be ignored.
+
+The following 6 column need to be present in the file.
+Even if some of the last columns are completely empty, they need to be defined explicitely;
+if you prepare the csv file with a spreadsheet program like LibreOffice, it is enough to define the 6 columns in the first row.
 * 1st column: the lecture ID's used in KIT's official university calendar, called “Lehrveranstaltungsnummer”. This ID will be used to query KitHub's API.
 * 2nd column: short string describing the course of studies, as we have at least three different ones at our department. This will be printed in the timetable.
 * 3rd column: name of the lecture, as it should be printed in the timetable. Some lectures have very long official titles, but very common abbreviations.
