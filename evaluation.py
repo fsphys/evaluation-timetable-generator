@@ -74,6 +74,7 @@ timetable_blocks = [{'time': time(hour=8, minute=0), 'block': 1},
 font_family = "Liberation Sans"
 font_size_name = "12pt"
 font_size = "10pt"
+font_size_header = "20pt"
 
 block_separator_border = "2pt solid #000000"
 block_separator_appointments = "1pt solid #000000"
@@ -364,7 +365,7 @@ build_timetable()
 
 # spreadsheet columns and rows start at 1, plus leave the first empty
 column_start = 2
-row_start = 2
+row_start = 3
 
 # number of columns and rows per entry
 appointment_width = 2
@@ -389,6 +390,9 @@ for block in range(1, 9):
     current_row += block_height[block] * appointment_height
 
 # print timetable
+print_cell(spreadsheet_timetable, 1, column_start + 1, "Evaluation", font_size_header)
+print_cell(spreadsheet_timetable, 1, column_start + 4, "{0} bis {1}".format(eva_starttime.strftime("%d.%m."), eva_endtime.strftime("%d.%m.")), font_size_header)
+
 for weekday in range(1, 6):
     print_timetable("{0}".format(weekdays[weekday]))
     weekday_column = column_start + 1 + (weekday-1) * appointment_width
