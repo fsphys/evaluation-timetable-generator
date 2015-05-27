@@ -20,8 +20,29 @@ from simpleodspy.sodsods import SodsOds
 # Configuration options
 ###
 
+###
+# Configuration for the current term
+###
+
+# get this from http://www.kithub.de/api/#!/terms/GET-terms---format-_get_0
+term_id = 10222 # Sommersemester 2015
+#term_id = 7895  # Wintersemester 2014/15
+# term_id = 7022 # Sommersemester 2014
+# term_id = 4521 # Wintersemester 2013/14
+
+# start and end time of the interval, in KitHub's datetime format,
+# for example "2014-06-09T00:00:00+02:00"
+eva_starttime_str = "2015-06-01T00:00:00+02:00"
+eva_endtime_str = "2015-06-19T23:59:59+02:00"
+
+###
+# General options
+###
+
 # set to True for more output
-verbose_output = False
+verbose_output = True
+# set to true if you want the timetable printed to stdout
+terminal_timetable = False
 
 input_file = "input.csv"
 output_file = "timetable.ods"
@@ -33,23 +54,12 @@ weekdays = {1: "Montag", 2: "Dienstag",
             3: "Mittwoch", 4: "Donnerstag", 5: "Freitag"}
 weekdays_short = {1: "Mo", 2: "Di", 3: "Mi", 4: "Do", 5: "Fr"}
 
-# get this from http://www.kithub.de/api/#!/terms/GET-terms---format-_get_0
-term_id = 10222 # Sommersemester 2015
-#term_id = 7895  # Wintersemester 2014/15
-# term_id = 7022 # Sommersemester 2014
-# term_id = 4521 # Wintersemester 2013/14
-
 # path of the directory where the data downloaded from the API is stored
 json_directory = "courses"
 
 # as %z is the offset with the format +HHMM, and without :,
 # delete all : while parsing
 datetime_format = "%Y-%m-%dT%H%M%S%z"  # 2014-06-11T19:00:00+02:00
-
-# start and end time of the interval, in KitHub's datetime format,
-# for example "2014-06-09T00:00:00+02:00"
-eva_starttime_str = "2015-06-01T00:00:00+02:00"
-eva_endtime_str = "2015-06-19T23:59:59+02:00"
 
 # start time of blocks in the timetable
 timetable_blocks = [{'time': time(hour=8, minute=0), 'block': 1},
@@ -65,9 +75,6 @@ font_size = "10pt"
 
 block_separator_border = "2pt solid #000000"
 block_separator_appointments = "1pt solid #000000"
-
-# set to true if you want the timetable printed to stdout
-terminal_timetable = False
 
 ###
 # End of configuration options
@@ -131,7 +138,7 @@ def get_course(course_lvnr):
         verbose("course {0} already downloaded.".format(course_lvnr))
         return
     try:
-        verbose("fetch course '{0}'.".format(course_lvnr))
+        print("fetch course '{0}'.".format(course_lvnr))
 
         # use rest api to access data
         response = urllib.request.urlopen(
@@ -197,12 +204,6 @@ def load_course_from_filesystem(filename):
             obj['id'], obj['no'], obj['name'], obj['lecturer'])
     course.appointments = course_parse_appointments(obj['dates'])
     return course
-
-
-def load_courses_from_filesystem():
-    for filename in glob.glob("{0}/*.json".format(json_directory)):
-        course = load_course_from_filesystem(filename)
-        courses[course.lvnr] = course
 
 
 # replace datetime in string format by an actual datetime object
