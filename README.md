@@ -30,7 +30,7 @@ Clone this repository or simply download the file `evaluation.py`.
 Configuration is currently done at the beginning of the Python file `evaluation.py`.
 To set up the script for a new semester, `term_id` has to be adapted.
 This is the ID of the semester within KitHub's database.
-The right number can be retrieved from [](http://www.kithub.de/api/#!/terms/GET-terms---format-_get_0), just click “Try it out!”.
+The right number can be retrieved by using [the web interface to KitHub's API](http://www.kithub.de/api/#!/terms/GET-terms---format-_get_0), just click “Try it out!”, or by reading [the reply of the API directly](https://www.kithub.de/api/terms.json).
 The time interval for which the timetable will be generated has to be specified with `eva_starttime_str` and `eva_endtime_str`.
 
 
@@ -69,10 +69,11 @@ These can be used to check certain functions of the script:
 
 1. Prepare an OpenDocument Spreadsheet document, for example called `input.ods`, that fulfills the requirements described above.
 2. Export it as CSV to `input.csv`.
-3. Call the script.
-4. Open `output.ods` to check what has been done. Decide which lectures to mark as ignored, and which ones to include an exercise or laboratory course. Note: of course some in this case actually not too difficult pattern matching logic could be used to determine which lectures belong together, but for the first version of the script, this has not yet been done.
-5. Go to step 2 if you changed anything. If not, check if `timetable.ods` fits your needs and go to step 4 if you need change the input file again.
-6. Adjust the formatting of `timetable.ods` if needed.
+3. Make sure the configuration options at the beginning of the file `evaluation.py` are set correctly, e.g. update the time range and the ID for the term.
+4. Call the script.
+5. Open `output.ods` to check what has been done. Decide which lectures to mark as ignored, and which ones to include an exercise or laboratory course. Note: of course some in this case actually not too difficult pattern matching logic could be used to determine which lectures belong together, but for the first version of the script, this has not yet been done.
+6. Go to step 2 if you changed anything. If not, check if `timetable.ods` fits your needs and go to step 5 if you need change the input file again.
+7. Adjust the formatting of `timetable.ods` if needed.
 
 
 ## Acknowledgements
