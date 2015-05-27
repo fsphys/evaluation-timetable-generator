@@ -263,6 +263,8 @@ def print_row(spreadsheet, row_number, row):
 def load_aliases_from_filesystem(filename):
     target = {}
     # get list of rooms and aliases from the configuration file
+    if not os.path.isfile(filename):
+        return target
     with open(filename, newline='') as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
         row_counter = 0
