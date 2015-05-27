@@ -452,10 +452,10 @@ for weekday in range(1, 5):
 
 print("Für die folgenden {0} Veranstaltungen wurde kein Termin im gewählten Zeitfenster gefunden:".format(len(courses_missed.values())))
 if not courses_missed:
-    print("  keine")
+    print("\tkeine")
 else:
     for course in courses_missed.values():
-        print("{0}, {1}, {2}".format(course.lvnr, course.name, course.lecturers))
+        print("\t{0}, {1}, {2}".format(course.lvnr, course.name, course.lecturers))
 
 
 if os.path.exists(output_file):
