@@ -40,7 +40,7 @@ eva_endtime_str = "2015-06-19T23:59:59+02:00"
 ###
 
 # set to True for more output
-verbose_output = True
+verbose_output = False
 # set to true if you want the timetable printed to stdout
 terminal_timetable = False
 
@@ -406,32 +406,27 @@ for weekday in range(1, 6):
             course_row_start = block_row_start + i*appointment_height
             print_cell(spreadsheet_timetable, course_row_start, weekday_column, course.name_short, font_size_name)
             print_cell(spreadsheet_timetable, course_row_start + 1, weekday_column, ", ".join([lecturers[_] for _ in course.lecturers]))
-            course_room = ""
-            course_dates = ""
+            course_rooms = []
+            course_dates = []
             for appointment in timetable[weekday][block][course_lvnr]:
                 print_timetable("      {0}, {1}".format(appointment.start.strftime("%d.%m."), rooms[appointment.room]))
-                if course_dates != "":
-                    course_dates += ", "
-                course_dates += appointment.start.strftime("%d.%m.")
-                if course_room != str(rooms[appointment.room]):
-                    if course_room != "":
-                        course_room += ", "
-                    course_room += str(rooms[appointment.room])
-            course_other_dates = ""
+                course_dates.append(appointment.start.strftime("%d.%m."))
+                if not rooms[appointment.room] in course_rooms:
+                    course_rooms.append(rooms[appointment.room])
+            course_other_dates = []
             for weekday_other, block_other in course.occurrences:
                 if not (weekday_other == weekday and block_other == block):
                     print_timetable(
                         "      Auch {0}/{1}".format(weekdays_short[weekday_other], block_other))
-                    if course_other_dates != "":
-                        course_other_dates += ", "
-                    course_other_dates += "{0}/{1}".format(weekdays_short[weekday_other], block_other)
+                    course_other_dates.append("{0}/{1}".format(weekdays_short[weekday_other], block_other))
                     for appointment_other in timetable[weekday_other][block_other][course_lvnr]:
                         print_timetable(
                             "        {0}".format(appointment_other.start.strftime("%d.%m.")))
-            if course_other_dates != "":
-                course_dates += "; auch " + course_other_dates
-            print_cell(spreadsheet_timetable, course_row_start, weekday_column + 1, course_room)
-            print_cell(spreadsheet_timetable, course_row_start + 2, weekday_column, course_dates)
+            course_other_dates_str = ""
+            if len(course_other_dates) > 0:
+                course_other_dates_str = "; auch " + ", ".join(course_other_dates)
+            print_cell(spreadsheet_timetable, course_row_start, weekday_column + 1, ", ".join(course_rooms))
+            print_cell(spreadsheet_timetable, course_row_start + 2, weekday_column, ", ".join(course_dates) + course_other_dates_str)
         block_row_start += block_height[block] * appointment_height
 
 
