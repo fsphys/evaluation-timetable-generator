@@ -186,11 +186,12 @@ def load_course_from_filesystem(filename):
         data = json.load(f)
     if len(data) > 1:
         print(
-            "There is more than 1 object encoded in file {0}. Please have a look. For now, I import them all.".format(filename))
-    for i, object in enumerate(data):
-        course = Course(
-            object['id'], object['no'], object['name'], object['lecturer'])
-        course.appointments = course_parse_appointments(object['dates'])
+                "WARNING: There is more than 1 object encoded in file {0}. Please have a look. For now, I only import the first.".format(filename))
+    obj = data[0]
+    # TODO: check if it's a dictionary
+    course = Course(
+            obj['id'], obj['no'], obj['name'], obj['lecturer'])
+    course.appointments = course_parse_appointments(obj['dates'])
     return course
 
 
