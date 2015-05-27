@@ -36,6 +36,11 @@ The time interval for which the timetable will be generated has to be specified 
 
 ### Input data
 
+Different csv files are used to configure the program.
+There is no special reason why the input file has to be CSV, other than that simpleodspy currently has problems reading OpenDocument Spreadsheet documents.
+
+#### Lectures to be included
+
 By default, the script expects a file `input.csv` in its working directory.
 The column delimiter needs to be `,` and `"` needs to be used for quoting strings.
 The first row is the header and will be ignored.
@@ -50,7 +55,11 @@ if you prepare the csv file with a spreadsheet program like LibreOffice, it is e
 * 5th column: if an `x` is entered here, a note will be added to the end of the name of the lecture to indicate that an exercise course belonging to the lecture has to be evaluated as well.
 * 6th column: if an `x` is entered here, a note will be added to the end of the name of the lecture to indicate that a laboratory course belonging to the lecture has to be evaluated as well.
 
-There is no special reason why the input file has to be CSV, other than that simpleodspy currently has problems reading OpenDocument Spreadsheet documents.
+#### Aliases for rooms and lecturers
+
+By default, the files `rooms.csv` and `lecturers.csv` can be used to define aliases for rooms and lecturers.
+This is useful to define abbreviations if the names coming from the database are very long.
+If the files do not exist, they are created, filled with the names from the database and without aliases.
 
 
 ### Run the script
@@ -74,9 +83,10 @@ These can be used to check certain functions of the script:
 2. Export it as CSV to `input.csv`.
 3. Make sure the configuration options at the beginning of the file `evaluation.py` are set correctly, e.g. update the time range and the ID for the term.
 4. Call the script.
-5. Open `output.ods` to check what has been done. Decide which lectures to mark as ignored, and which ones to include an exercise or laboratory course. Note: of course some in this case actually not too difficult pattern matching logic could be used to determine which lectures belong together, but for the first version of the script, this has not yet been done.
-6. Go to step 2 if you changed anything. If not, check if `timetable.ods` fits your needs and go to step 5 if you need change the input file again.
-7. Adjust the formatting of `timetable.ods` if needed.
+5. Open `output.ods` to check what has been done. Decide which lectures to mark as ignored, and which ones to include an exercise or laboratory course.
+6. Decide if you want to define aliases for rooms and lecturers in the files `rooms.csv` and `lecturers.csv`.
+7. Go to step 2 if you changed anything in step 5 or 6. If not, check if `timetable.ods`.
+8. Adjust the formatting of `timetable.ods` if needed.
 
 
 ## Acknowledgements
