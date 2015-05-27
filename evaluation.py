@@ -45,6 +45,8 @@ verbose_output = True
 terminal_timetable = False
 
 input_file = "input.csv"
+lecturers_file = "lecturers.csv"
+rooms_file = "rooms.csv"
 output_file = "timetable.ods"
 output_comparison_file = "output.ods"
 
@@ -92,13 +94,14 @@ output_comparison_col_name_vvz = 8
 
 class Course:
 
-    def __init__(self, id, lvnr, name, lecturer):
+    def __init__(self, id, lvnr, name, lecturers):
         self.id = int(id)
         self.lvnr = int(lvnr)
         self.name = name
         self.name_short = ""
         self.category = ""
-        self.lecturer = lecturer
+        # TODO: rename to lecturers
+        self.lecturers = [_.strip() for _ in lecturers.split(",")]
         # all occurrences over the whole semester
         self.appointments = []
         # just occurrences within the time frame, containing a list of
@@ -253,11 +256,48 @@ def print_row(spreadsheet, row_number, row):
     for i, cell in enumerate(row):
         print_cell(spreadsheet, row_number, i+1, cell)
 
+def load_aliases_from_filesystem(filename):
+    target = {}
+    # get list of rooms and aliases from the configuration file
+    with open(filename, newline='') as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        row_counter = 0
+        for row in csvreader:
+            if row_counter > 0:
+                if not row[0] in target:
+                    alias = row[1].strip()
+                    # if there is no alias, use the original name
+                    if alias == "":
+                        alias = row[0]
+                    target[row[0]] = alias
+                else:
+                    print("ERROR: Doubled entry in {0}, line {1}: {2}.".format(filename, row_counter, row[0]))
+            row_counter += 1
+        verbose("Read {0} rooms from {1}".format(row_counter, filename))
+    return target
+
+def write_aliases(filename, source):
+    # write alias file back to disk
+    with open(filename, 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        csvwriter.writerow(['Name', 'Alias'])
+        for name, alias in source.items():
+            if alias == name:
+                alias = ""
+            csvwriter.writerow([name, alias])
+
 
 # holds all courses as Course objects with course.lvnr as key
 courses = {}
 # holds courses for which no appointment was found within the time interval
 courses_missed = {}
+
+# holds aliases for rooms
+rooms = {}
+new_rooms = False
+# holds aliases for lecturers
+lecturers = {}
+new_lecturers = False
 
 eva_starttime = parse_datetime(eva_starttime_str)
 eva_endtime = parse_datetime(eva_endtime_str)
@@ -281,6 +321,32 @@ with open(input_file, newline='') as csvfile:
                 course.name_short += " ({0})".format(row[1])
             courses[course.lvnr] = course
         row_counter += 1
+
+lecturers = load_aliases_from_filesystem(lecturers_file)
+rooms = load_aliases_from_filesystem(rooms_file)
+
+# check if there are more lecturers
+for course in courses.values():
+    for lecturer in course.lecturers:
+        # add to list of lecturer aliases
+        if not lecturer in lecturers:
+            lecturers[lecturer] = lecturer
+            new_lecturers = True
+if new_lecturers:
+    verbose("Courses have lecturers that are not yet in {0}".format(lecturers_file))
+    write_aliases(lecturers_file, lecturers)
+
+# check if there are more rooms
+for course in courses.values():
+    for appointment in course.appointments:
+        # add to list of lecturer aliases
+        if not appointment.room in rooms:
+            rooms[appointment.room] = appointment.room
+            new_rooms = True
+if new_rooms:
+    verbose("Courses have rooms that are not yet in {0}".format(rooms_file))
+    write_aliases(rooms_file, rooms)
+
 
 spreadsheet_output_comparison = SodsSpreadSheet(row_counter, 10)
 
@@ -332,21 +398,21 @@ for weekday in range(1, 6):
         print_timetable("  {0}. Block".format(block))
         for i, course_lvnr in enumerate(timetable[weekday][block].keys()):
             course = courses[course_lvnr]
-            print_timetable("    {0}, {1}".format(course.name, course.lecturer))
+            print_timetable("    {0}, {1}".format(course.name, ", ".join([lecturers[_] for _ in course.lecturers])))
             course_row_start = block_row_start + i*appointment_height
             print_cell(spreadsheet_timetable, course_row_start, weekday_column, course.name_short, font_size_name)
-            print_cell(spreadsheet_timetable, course_row_start + 1, weekday_column, course.lecturer)
+            print_cell(spreadsheet_timetable, course_row_start + 1, weekday_column, ", ".join([lecturers[_] for _ in course.lecturers]))
             course_room = ""
             course_dates = ""
             for appointment in timetable[weekday][block][course_lvnr]:
-                print_timetable("      {0}, {1}".format(appointment.start.strftime("%d.%m."), appointment.room))
+                print_timetable("      {0}, {1}".format(appointment.start.strftime("%d.%m."), rooms[appointment.room]))
                 if course_dates != "":
                     course_dates += ", "
                 course_dates += appointment.start.strftime("%d.%m.")
-                if course_room != str(appointment.room):
+                if course_room != str(rooms[appointment.room]):
                     if course_room != "":
                         course_room += ", "
-                    course_room += str(appointment.room)
+                    course_room += str(rooms[appointment.room])
             course_other_dates = ""
             for weekday_other, block_other in course.occurrences:
                 if not (weekday_other == weekday and block_other == block):
@@ -390,7 +456,7 @@ if not courses_missed:
     print("  keine")
 else:
     for course in courses_missed.values():
-        print("{0}, {1}, {2}".format(course.lvnr, course.name, course.lecturer))
+        print("{0}, {1}, {2}".format(course.lvnr, course.name, course.lecturers))
 
 
 if os.path.exists(output_file):
