@@ -20,6 +20,9 @@ from simpleodspy.sodsods import SodsOds
 # Configuration options
 ###
 
+# set to True for more output
+verbose_output = False
+
 input_file = "input.csv"
 output_file = "timetable.ods"
 output_comparison_file = "output.ods"
@@ -141,17 +144,17 @@ def get_course(course_lvnr):
             file.write(json.dumps(data, indent=2, sort_keys=True))
 
     except urllib.error.URLError as err:
-        print("URLError while fetching course '{0}': {1}".format(
+        print("ERROR: URLError while fetching course '{0}': {1}".format(
             course_lvnr, err.reason))
     except urllib.error.HTTPError as err:
-        print("HTTPError '{0}' while fetching course '{1}': {2}".format(
+        print("ERROR: HTTPError '{0}' while fetching course '{1}': {2}".format(
             err.code, course_lvnr, err.reason))
     except ValueError:
-        print("ValueError while parsing content as JSON for course '{0}'.".format(
+        print("ERROR: ValueError while parsing content as JSON for course '{0}'.".format(
             course_lvnr))
     except:
         print(
-            "Unexpected error while fetching course '{0}': ".format(course_lvnr))
+                "ERROR: Unexpected error while fetching course '{0}': ".format(course_lvnr))
         print(sys.exc_info()[0])
 
 
@@ -221,7 +224,8 @@ def parse_datetime(str):
 
 
 def verbose(str):
-    print(str)
+    if verbose_output:
+        print(str)
 
 
 def print_timetable(str):
